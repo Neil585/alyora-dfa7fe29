@@ -14,7 +14,218 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessments: {
+        Row: {
+          answers: Json
+          burnout_score: number
+          categories: string[]
+          created_at: string
+          gad7_score: number
+          id: string
+          phq9_score: number
+          sleep_score: number
+          stress_score: number
+          summary: string | null
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          burnout_score?: number
+          categories?: string[]
+          created_at?: string
+          gad7_score?: number
+          id?: string
+          phq9_score?: number
+          sleep_score?: number
+          stress_score?: number
+          summary?: string | null
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          burnout_score?: number
+          categories?: string[]
+          created_at?: string
+          gad7_score?: number
+          id?: string
+          phq9_score?: number
+          sleep_score?: number
+          stress_score?: number
+          summary?: string | null
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parts: Json | null
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parts?: Json | null
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parts?: Json | null
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_check_ins: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          mood: number
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day?: string
+          id?: string
+          mood: number
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
+          mood?: number
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      practitioners: {
+        Row: {
+          approach: string | null
+          bio: string
+          city: string
+          country: string
+          created_at: string
+          full_name: string
+          id: string
+          languages: string[]
+          modalities: string[]
+          photo_url: string | null
+          price_eur: number
+          specialties: string[]
+          title: string
+          years_experience: number
+        }
+        Insert: {
+          approach?: string | null
+          bio: string
+          city: string
+          country?: string
+          created_at?: string
+          full_name: string
+          id?: string
+          languages?: string[]
+          modalities?: string[]
+          photo_url?: string | null
+          price_eur?: number
+          specialties?: string[]
+          title: string
+          years_experience?: number
+        }
+        Update: {
+          approach?: string | null
+          bio?: string
+          city?: string
+          country?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          languages?: string[]
+          modalities?: string[]
+          photo_url?: string | null
+          price_eur?: number
+          specialties?: string[]
+          title?: string
+          years_experience?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_year: number | null
+          city: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          birth_year?: number | null
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          birth_year?: number | null
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
