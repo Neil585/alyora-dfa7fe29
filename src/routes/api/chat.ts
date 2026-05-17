@@ -94,7 +94,7 @@ export const Route = createFileRoute("/api/chat")({
               user_id: userId,
               role: "user",
               content: text,
-              parts: last.parts as unknown as object,
+              parts: last.parts as never,
             });
             await supabase
               .from("chat_threads")
@@ -126,7 +126,7 @@ export const Route = createFileRoute("/api/chat")({
                 user_id: userId,
                 role: "assistant",
                 content: text,
-                parts: responseMessage.parts as unknown as object,
+                parts: responseMessage.parts as never,
               });
               await supabase
                 .from("chat_threads")
