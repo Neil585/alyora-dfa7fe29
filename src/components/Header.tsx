@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/alyora-logo.png";
+import logo from "@/assets/alyora-mark.png";
 
 export function Header() {
   const { user } = useAuth();
@@ -16,7 +16,8 @@ export function Header() {
     <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Alyora" className="h-10 w-auto" />
+          <img src={logo} alt="Alyora" className="h-10 w-10" />
+          <span className="font-serif text-2xl tracking-tight">Alyora</span>
         </Link>
         <nav className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
           <Link to="/therapists" className="hover:text-foreground transition-colors" activeProps={{ className: "text-foreground" }}>
