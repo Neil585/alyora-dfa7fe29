@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TherapistsIdRouteImport } from './routes/therapists.$id'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated.chat.$threadId'
 import { Route as AuthenticatedAppHistoryRouteImport } from './routes/_authenticated.app.history'
 import { Route as AuthenticatedAppAssessmentRouteImport } from './routes/_authenticated.app.assessment'
@@ -66,6 +67,11 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedChatThreadIdRoute =
   AuthenticatedChatThreadIdRouteImport.update({
     id: '/chat/$threadId',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/app/assessment': typeof AuthenticatedAppAssessmentRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -103,12 +110,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/therapists': typeof TherapistsRouteWithChildren
-  '/app': typeof AuthenticatedAppRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/therapists/$id': typeof TherapistsIdRoute
   '/app/assessment': typeof AuthenticatedAppAssessmentRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated/app/assessment': typeof AuthenticatedAppAssessmentRoute
   '/_authenticated/app/history': typeof AuthenticatedAppHistoryRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,6 +147,7 @@ export interface FileRouteTypes {
     | '/app/assessment'
     | '/app/history'
     | '/chat/$threadId'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -146,12 +155,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/therapists'
-    | '/app'
     | '/api/chat'
     | '/therapists/$id'
     | '/app/assessment'
     | '/app/history'
     | '/chat/$threadId'
+    | '/app'
   id:
     | '__root__'
     | '/'
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/assessment'
     | '/_authenticated/app/history'
     | '/_authenticated/chat/$threadId'
+    | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -243,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/chat/$threadId': {
       id: '/_authenticated/chat/$threadId'
       path: '/chat/$threadId'
@@ -270,11 +287,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAssessmentRoute: typeof AuthenticatedAppAssessmentRoute
   AuthenticatedAppHistoryRoute: typeof AuthenticatedAppHistoryRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAssessmentRoute: AuthenticatedAppAssessmentRoute,
   AuthenticatedAppHistoryRoute: AuthenticatedAppHistoryRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 
 const AuthenticatedAppRouteWithChildren =
