@@ -96,7 +96,17 @@ function AppDashboard() {
               {latest ? "Refaire le point" : "Faire le point"}
             </Link>
           </div>
-          <Link to="/app/history" className="text-sm underline text-muted-foreground mt-4 inline-block">Voir l'évolution</Link>
+          <div className="mt-4 flex flex-wrap gap-4 text-sm">
+            <Link to="/app/history" className="underline text-muted-foreground">Voir l'évolution</Link>
+            {latest && (
+              <button
+                onClick={() => createThreadMutation.mutate()}
+                className="underline text-muted-foreground hover:text-foreground"
+              >
+                En parler avec Alyora
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Suggestions praticien */}
