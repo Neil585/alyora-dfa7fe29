@@ -6,7 +6,7 @@ import { listAssessments, listCheckIns, upsertCheckIn } from "@/lib/assessment.f
 import { listThreads, createThread } from "@/lib/chat.functions";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/app")({
+export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({ meta: [{ title: "Mon espace — Alyora" }] }),
   component: AppDashboard,
 });
