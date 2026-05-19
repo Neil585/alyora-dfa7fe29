@@ -5,7 +5,7 @@ import { listAssessments } from "@/lib/assessment.functions";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/app/history")({
-  head: () => ({ meta: [{ title: "Mon évolution — Alyora" }] }),
+  head: () => ({ meta: [{ title: "Mon évolution , Alyora" }] }),
   component: History,
 });
 

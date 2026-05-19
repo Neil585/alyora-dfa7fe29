@@ -5,7 +5,7 @@ import textureImg from "@/assets/texture.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Alyora — Reprendre pied, doucement" },
+      { title: "Alyora , Reprendre pied, doucement" },
       { name: "description", content: "Un compagnon de soutien émotionnel pour les jeunes actifs. Faites le point, suivez votre évolution, parlez à quelqu'un quand vous en avez besoin." },
     ],
   }),
@@ -19,32 +19,68 @@ function Landing() {
       <section className="relative">
         <div className="mx-auto max-w-6xl px-6 pt-16 pb-24 grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-sm uppercase tracking-widest text-muted-foreground mb-6">Pour celles et ceux qui tiennent debout, mais qui fatiguent</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-xs uppercase tracking-wider text-muted-foreground mb-6">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Plateforme de suivi mental
+            </div>
             <h1 className="font-serif text-5xl md:text-6xl leading-[1.05] text-foreground">
-              Reprendre pied, sans devoir tout expliquer.
+              Faites le point. Suivez votre évolution. Trouvez le bon praticien.
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-lg">
-              Alyora vous accompagne au jour le jour. Vous faites un point quand vous en avez besoin, vous gardez une trace de ce qui change, et vous trouvez un praticien quand le moment est venu d'en parler à quelqu'un.
+              Alyora est un espace privé où vous évaluez votre état mental avec des questionnaires reconnus, gardez l'historique de vos bilans, et parlez à un compagnon qui connaît votre dossier. Le tout en quelques minutes.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-3 bg-primary text-primary-foreground rounded-full text-sm hover:opacity-90 transition-opacity">
-                Commencer gratuitement
+                Faire mon premier bilan
               </Link>
               <Link to="/therapists" className="px-6 py-3 border border-border rounded-full text-sm hover:bg-secondary transition-colors">
                 Voir les praticiens
               </Link>
             </div>
-            <p className="mt-6 text-xs text-muted-foreground">
-              Alyora ne remplace pas un thérapeute. C'est un appui entre les séances, ou avant d'oser en commencer.
-            </p>
+            <div className="mt-8 grid grid-cols-3 gap-4 max-w-md">
+              <div>
+                <div className="font-serif text-2xl">5 min</div>
+                <div className="text-xs text-muted-foreground">par bilan</div>
+              </div>
+              <div>
+                <div className="font-serif text-2xl">PHQ-9</div>
+                <div className="text-xs text-muted-foreground">GAD-7, MBI</div>
+              </div>
+              <div>
+                <div className="font-serif text-2xl">100 %</div>
+                <div className="text-xs text-muted-foreground">confidentiel</div>
+              </div>
+            </div>
           </div>
           <div className="relative">
             <div className="aspect-[4/5] rounded-3xl overflow-hidden">
-              <img src={heroImg} alt="Personne calme près d'une fenêtre" className="w-full h-full object-cover" width={1536} height={1920} />
+              <img src={heroImg} alt="Personne calme dans un environnement apaisant" className="w-full h-full object-cover" width={1200} height={1500} />
             </div>
           </div>
         </div>
       </section>
+
+      {/* Features SaaS */}
+      <section className="border-y border-border bg-card/40 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Ce que vous obtenez</div>
+          <h2 className="font-serif text-3xl md:text-4xl mb-12 max-w-2xl">Un outil de suivi mental, simple et sérieux.</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              { t: "Bilans cliniques", d: "Des questionnaires inspirés des outils validés en consultation : PHQ-9, GAD-7, MBI." },
+              { t: "Historique daté", d: "Chaque bilan est horodaté et conservé dans votre espace. Vous voyez la courbe sur plusieurs mois." },
+              { t: "Compagnon contextuel", d: "Un chat qui connaît vos derniers résultats et peut vous orienter au bon moment." },
+              { t: "Annuaire de praticiens", d: "Psychologues et thérapeutes, filtrables par ville, spécialité, modalité." },
+            ].map((b) => (
+              <div key={b.t} className="bg-background border border-border rounded-2xl p-6">
+                <h3 className="font-serif text-lg mb-2">{b.t}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{b.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       {/* Pour qui */}
       <section className="bg-secondary/40 py-20">
@@ -129,7 +165,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        Alyora — Plateforme de soutien émotionnel non médical. En cas d'urgence : 3114 (prévention du suicide), 15 (SAMU).
+        Alyora , Plateforme de soutien émotionnel non médical. En cas d'urgence : 3114 (prévention du suicide), 15 (SAMU).
       </footer>
     </div>
   );
