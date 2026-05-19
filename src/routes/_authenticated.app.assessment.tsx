@@ -123,8 +123,13 @@ function Assessment() {
   // === Questionnaire ===
   const section = SECTIONS[step];
   const isLast = step === SECTIONS.length - 1;
-  const allAnswered = section.questions.every((q) => answers[q.id] !== undefined);
-  const progress = ((step + (allAnswered ? 1 : 0)) / SECTIONS.length) * 100;
+  const progress = ((step + 1) / SECTIONS.length) * 100;
+
+  const clearSection = () => {
+    const next = { ...answers };
+    section.questions.forEach((q) => { delete next[q.id]; });
+    setAnswers(next);
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
@@ -140,7 +145,10 @@ function Assessment() {
       </div>
 
       <h1 className="font-serif text-3xl mb-2">{section.title}</h1>
-      <p className="text-muted-foreground mb-8">{section.description}</p>
+      <p className="text-muted-foreground mb-2">{section.description}</p>
+      <p className="text-xs text-muted-foreground mb-8">
+        Toutes les questions sont facultatives. Sautez celles qui ne vous parlent pas.
+      </p>
 
       <div className="space-y-6">
         {section.questions.map((q) => (
@@ -164,11 +172,23 @@ function Assessment() {
                 );
               })}
             </div>
+            {answers[q.id] !== undefined && (
+              <button
+                onClick={() => {
+                  const next = { ...answers };
+                  delete next[q.id];
+                  setAnswers(next);
+                }}
+                className="mt-3 text-xs text-muted-foreground underline"
+              >
+                Effacer ma réponse
+              </button>
+            )}
           </div>
         ))}
       </div>
 
-      <div className="mt-8 flex justify-between">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
         <button
           onClick={() => setStep(Math.max(0, step - 1))}
           disabled={step === 0}
@@ -176,23 +196,30 @@ function Assessment() {
         >
           Précédent
         </button>
-        {isLast ? (
+        <div className="flex gap-2">
           <button
-            onClick={() => m.mutate()}
-            disabled={!allAnswered || m.isPending}
-            className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+            onClick={() => { clearSection(); isLast ? m.mutate() : setStep(step + 1); }}
+            className="px-4 py-2.5 rounded-full text-sm text-muted-foreground hover:bg-secondary"
           >
-            {m.isPending ? "Enregistrement..." : "Voir mon bilan"}
+            Passer cette section
           </button>
-        ) : (
-          <button
-            onClick={() => setStep(step + 1)}
-            disabled={!allAnswered}
-            className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground disabled:opacity-40"
-          >
-            Suivant
-          </button>
-        )}
+          {isLast ? (
+            <button
+              onClick={() => m.mutate()}
+              disabled={m.isPending}
+              className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+            >
+              {m.isPending ? "Enregistrement..." : "Voir mon bilan"}
+            </button>
+          ) : (
+            <button
+              onClick={() => setStep(step + 1)}
+              className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground"
+            >
+              Suivant
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

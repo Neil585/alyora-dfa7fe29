@@ -5,7 +5,7 @@ import textureImg from "@/assets/texture.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Alyora — Reprendre pied, doucement" },
+      { title: "Alyora , Reprendre pied, doucement" },
       { name: "description", content: "Un compagnon de soutien émotionnel pour les jeunes actifs. Faites le point, suivez votre évolution, parlez à quelqu'un quand vous en avez besoin." },
     ],
   }),
@@ -129,7 +129,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        Alyora — Plateforme de soutien émotionnel non médical. En cas d'urgence : 3114 (prévention du suicide), 15 (SAMU).
+        Alyora , Plateforme de soutien émotionnel non médical. En cas d'urgence : 3114 (prévention du suicide), 15 (SAMU).
       </footer>
     </div>
   );

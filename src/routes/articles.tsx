@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/articles")({
-  head: () => ({ meta: [{ title: "Lectures — Alyora" }, { name: "description", content: "Des lectures pour comprendre, pas pour s'auto-diagnostiquer." }] }),
+  head: () => ({ meta: [{ title: "Lectures , Alyora" }, { name: "description", content: "Des lectures pour comprendre, pas pour s'auto-diagnostiquer." }] }),
   component: Articles,
 });
 

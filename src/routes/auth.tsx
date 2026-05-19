@@ -9,7 +9,7 @@ const search = z.object({ mode: z.enum(["signin", "signup"]).optional() });
 
 export const Route = createFileRoute("/auth")({
   validateSearch: search,
-  head: () => ({ meta: [{ title: "Connexion — Alyora" }] }),
+  head: () => ({ meta: [{ title: "Connexion , Alyora" }] }),
   component: AuthPage,
 });
 

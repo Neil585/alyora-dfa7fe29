@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listPractitioners } from "@/lib/practitioners.functions";
 
 export const Route = createFileRoute("/therapists")({
-  head: () => ({ meta: [{ title: "Praticiens — Alyora" }, { name: "description", content: "Trouvez un psychologue, un thérapeute ou un coach. Filtrez par ville, spécialité, modalité." }] }),
+  head: () => ({ meta: [{ title: "Praticiens , Alyora" }, { name: "description", content: "Trouvez un psychologue, un thérapeute ou un coach. Filtrez par ville, spécialité, modalité." }] }),
   component: Therapists,
 });
 
