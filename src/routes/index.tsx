@@ -21,7 +21,7 @@ function Landing() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-xs uppercase tracking-wider text-muted-foreground mb-6">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Plateforme de suivi mental
+              Soutien psychologique au quotidien
             </div>
             <h1 className="font-serif text-5xl md:text-6xl leading-[1.05] text-foreground">
               Faites le point. Suivez votre évolution. Trouvez le bon praticien.
