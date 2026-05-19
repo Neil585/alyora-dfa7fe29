@@ -8,7 +8,7 @@ import { createThread } from "@/lib/chat.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/app/assessment")({
-  head: () => ({ meta: [{ title: "Faire le point — Alyora" }] }),
+  head: () => ({ meta: [{ title: "Faire le point , Alyora" }] }),
   component: Assessment,
 });
 
