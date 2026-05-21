@@ -94,11 +94,14 @@ function AuthSync() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  const hideHeader = pathname.startsWith("/app") || pathname.startsWith("/practitioner-space") || pathname.startsWith("/chat/");
   return (
     <QueryClientProvider client={queryClient}>
       <AuthSync />
       <div className="min-h-screen flex flex-col">
-        <Header />
+        {!hideHeader && <Header />}
         <main className="flex-1"><Outlet /></main>
       </div>
       <ChatPopup />
