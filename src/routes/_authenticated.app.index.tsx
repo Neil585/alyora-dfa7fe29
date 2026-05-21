@@ -1,280 +1,287 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
-import { Flame, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Bell, Plus, Smile, TrendingUp, Target, Play, Flame, Brain, Moon, Activity as ActivityIcon } from "lucide-react";
 import { listAssessments } from "@/lib/assessment.functions";
-import { listThreads, createThread } from "@/lib/chat.functions";
+import { listPractitioners } from "@/lib/practitioners.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/app/")({
-  head: () => ({ meta: [{ title: "Mon espace , Alyora" }] }),
+  head: () => ({ meta: [{ title: "Mon espace, Alyora" }] }),
   component: AppDashboard,
 });
 
-const DAILY_TIPS = [
-  "Aujourd'hui, essayez de couper les notifications pendant le déjeuner. Juste ce moment.",
-  "Notez trois choses qui se sont bien passées hier, même petites. Ça reprogramme l'attention.",
-  "Si vous sentez monter quelque chose, posez-vous et respirez : 4 secondes inspirer, 6 secondes expirer, pendant deux minutes.",
-  "Marchez dix minutes sans téléphone. Vraiment sans.",
-  "Avant de dormir, écrivez ce qui n'est pas terminé. Sortir les choses de la tête aide à les lâcher.",
-  "Identifiez une chose que vous faites par habitude et qui ne vous nourrit plus. Pas besoin de l'arrêter, juste de la voir.",
-  "Buvez un verre d'eau maintenant. C'est petit, ça compte.",
-];
+const MAX_TOTAL = 78; // phq9 27 + gad7 21 + burnout 12 + stress 9 + sleep 9
 
-// Monday-based week key
-function weekKey(date: Date) {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const day = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  return `${d.getUTCFullYear()}-W${weekNo}`;
+function alyoraScore(a: { phq9_score: number; gad7_score: number; burnout_score: number; stress_score: number; sleep_score: number } | undefined) {
+  if (!a) return null;
+  const sum = a.phq9_score + a.gad7_score + a.burnout_score + a.stress_score + a.sleep_score;
+  return Math.max(0, Math.min(100, Math.round(100 - (sum / MAX_TOTAL) * 100)));
 }
 
-function computeStreak(dates: Date[]) {
-  if (dates.length === 0) return 0;
-  const weeks = new Set(dates.map(weekKey));
-  let streak = 0;
-  const cursor = new Date();
-  while (weeks.has(weekKey(cursor))) {
-    streak++;
-    cursor.setDate(cursor.getDate() - 7);
+function weekKey(d: Date) {
+  const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = x.getUTCDay() || 7;
+  x.setUTCDate(x.getUTCDate() + 4 - day);
+  const ys = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+  return `${x.getUTCFullYear()}-${Math.ceil(((x.getTime() - ys.getTime()) / 86400000 + 1) / 7)}`;
+}
+
+function streakOf(dates: Date[]) {
+  const set = new Set(dates.map(weekKey));
+  let s = 0;
+  const cur = new Date();
+  while (set.has(weekKey(cur))) { s++; cur.setDate(cur.getDate() - 7); }
+  if (s === 0) {
+    const last = new Date(); last.setDate(last.getDate() - 7);
+    while (set.has(weekKey(last))) { s++; last.setDate(last.getDate() - 7); }
   }
-  if (streak === 0) {
-    // Allow last week to count if user hasn't done one yet this week
-    const last = new Date();
-    last.setDate(last.getDate() - 7);
-    while (weeks.has(weekKey(last))) {
-      streak++;
-      last.setDate(last.getDate() - 7);
-    }
-  }
-  return streak;
+  return s;
 }
 
 function AppDashboard() {
-  const qc = useQueryClient();
+  const { user } = useAuth();
   const fetchList = useServerFn(listAssessments);
-  const fetchThreads = useServerFn(listThreads);
-  const newThread = useServerFn(createThread);
-
+  const fetchPractitioners = useServerFn(listPractitioners);
   const { data: assessments = [] } = useQuery({ queryKey: ["assessments"], queryFn: () => fetchList() });
-  const { data: threads = [] } = useQuery({ queryKey: ["threads"], queryFn: () => fetchThreads() });
+  const { data: practitioners = [] } = useQuery({ queryKey: ["practitioners-dash"], queryFn: () => fetchPractitioners({ data: {} }) });
 
   const latest = assessments[0];
-  const tipIndex = new Date().getDay() % DAILY_TIPS.length;
+  const previous = assessments[1];
+  const score = alyoraScore(latest);
+  const prevScore = alyoraScore(previous);
+  const delta = score !== null && prevScore !== null ? score - prevScore : null;
 
-  const dates = assessments.map((a) => new Date(a.taken_at));
-  const streak = computeStreak(dates);
+  const streak = streakOf(assessments.map((a) => new Date(a.taken_at)));
   const total = assessments.length;
-  const daysSince = latest
-    ? Math.floor((Date.now() - new Date(latest.taken_at).getTime()) / 86400000)
-    : null;
-
-  // Next milestone
   const milestones = [1, 3, 5, 10, 20];
-  const nextMilestone = milestones.find((m) => m > total) ?? total + 5;
-  const milestoneProgress = Math.min(100, Math.round((total / nextMilestone) * 100));
+  const next = milestones.find((m) => m > total) ?? total + 5;
+  const milestoneProgress = Math.min(100, Math.round((total / next) * 100));
 
-  const createThreadMutation = useMutation({
-    mutationFn: () => newThread({ data: {} }),
-    onSuccess: (t) => { window.location.href = `/chat/${t.id}`; qc.invalidateQueries({ queryKey: ["threads"] }); },
+  // Weekly activity (last 7 days, count of assessments per day)
+  const today = new Date();
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (6 - i));
+    return d;
   });
+  const dayLabels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - 6);
+  const counts = days.map((d) => {
+    const dayKey = d.toISOString().slice(0, 10);
+    return assessments.filter((a) => new Date(a.taken_at).toISOString().slice(0, 10) === dayKey).length;
+  });
+  const maxCount = Math.max(1, ...counts);
+
+  const firstName = (user?.user_metadata?.full_name || user?.email?.split("@")[0] || "vous").split(" ")[0];
+
+  const recommended = practitioners.slice(0, 3);
 
   return (
-    <div className="relative">
-      {/* Ambient background */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl"
-          animate={{ x: [0, 40, 0], y: [0, 20, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-40 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl"
-          animate={{ x: [0, -30, 0], y: [0, 30, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-5xl px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="font-serif text-4xl mb-2">Mon espace</h1>
-          <p className="text-muted-foreground mb-10">Un endroit calme pour faire le point.</p>
-        </motion.div>
-
-        {/* Streak hero card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-          className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/15 p-6 md:p-8 mb-6"
-        >
-          <div className="grid md:grid-cols-3 gap-6 items-center">
-            <div className="md:col-span-2">
-              <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Votre régularité</div>
-              <div className="flex items-end gap-6 flex-wrap">
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.2 }}
-                  className="flex items-center gap-3"
-                >
-                  <div className="relative">
-                    <Flame className={`h-10 w-10 ${streak > 0 ? "text-orange-500" : "text-muted-foreground"}`} />
-                    {streak > 0 && (
-                      <motion.div
-                        className="absolute inset-0 rounded-full bg-orange-500/30 blur-xl"
-                        animate={{ opacity: [0.4, 0.8, 0.4] }}
-                        transition={{ duration: 2.4, repeat: Infinity }}
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-serif text-4xl leading-none">{streak}</div>
-                    <div className="text-xs text-muted-foreground mt-1">semaine{streak > 1 ? "s" : ""} d'affilée</div>
-                  </div>
-                </motion.div>
-
-                <div className="flex items-center gap-3">
-                  <Target className="h-7 w-7 text-primary" />
-                  <div>
-                    <div className="font-serif text-3xl leading-none">{total}</div>
-                    <div className="text-xs text-muted-foreground mt-1">bilan{total > 1 ? "s" : ""} au total</div>
-                  </div>
-                </div>
-
-                {daysSince !== null && (
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="h-7 w-7 text-muted-foreground" />
-                    <div>
-                      <div className="font-serif text-3xl leading-none">{daysSince}j</div>
-                      <div className="text-xs text-muted-foreground mt-1">depuis le dernier</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                  <span>Prochain palier : {nextMilestone} bilans</span>
-                  <span>{total}/{nextMilestone}</span>
-                </div>
-                <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-primary to-accent"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${milestoneProgress}%` }}
-                    transition={{ duration: 0.9, ease: "easeOut" }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex md:justify-end">
-              <Link to="/app/assessment" className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-full text-sm hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-                <Sparkles className="h-4 w-4" />
-                {latest ? (daysSince !== null && daysSince < 7 ? "Refaire un point" : "Garder le streak") : "Faire mon premier point"}
-              </Link>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Conseil du jour */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="bg-secondary/50 border border-border rounded-2xl p-6"
-          >
-            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Conseil du jour</div>
-            <p className="font-serif text-xl leading-snug">{DAILY_TIPS[tipIndex]}</p>
-          </motion.div>
-
-          {/* Dossier */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="bg-card border border-border rounded-2xl p-6"
-          >
-            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Dernier dossier</div>
-            {latest ? (
-              <>
-                <p className="text-sm text-muted-foreground">{new Date(latest.taken_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</p>
-                <p className="mt-3 leading-relaxed text-sm">{latest.summary}</p>
-                {latest.categories.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {latest.categories.map((c) => <span key={c} className="text-xs px-2 py-0.5 rounded-full bg-accent text-accent-foreground">{c}</span>)}
-                  </div>
-                )}
-                <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                  <Link to="/app/history" className="underline text-muted-foreground">Voir l'évolution</Link>
-                  <button onClick={() => createThreadMutation.mutate()} className="underline text-muted-foreground hover:text-foreground">
-                    En parler avec Alyora Genius
-                  </button>
-                </div>
-              </>
-            ) : (
-              <p className="text-muted-foreground">Vous n'avez pas encore fait de point. C'est le bon moment.</p>
-            )}
-          </motion.div>
-
-          {/* Suggestions praticien */}
-          {latest && latest.categories.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-card border border-border rounded-2xl p-6 md:col-span-2"
-            >
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Praticiens recommandés</div>
-              <p className="text-sm text-muted-foreground mb-4">D'après votre dossier, certains praticiens spécialisés pourraient vous correspondre.</p>
-              <div className="flex flex-wrap gap-2">
-                {latest.categories.map((c) => (
-                  <Link key={c} to="/therapists" className="text-sm px-3 py-1.5 rounded-full bg-secondary hover:bg-accent transition-colors">
-                    Voir pour {c} →
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Conversations */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="bg-card border border-border rounded-2xl p-6 md:col-span-2"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Mes conversations</div>
-              <button onClick={() => createThreadMutation.mutate()} className="text-sm px-3 py-1.5 bg-primary text-primary-foreground rounded-full">
-                Nouvelle conversation
-              </button>
-            </div>
-            {threads.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucune conversation pour le moment.</p>
-            ) : (
-              <ul className="divide-y divide-border">
-                {threads.map((t) => (
-                  <li key={t.id}>
-                    <Link to="/chat/$threadId" params={{ threadId: t.id }} className="block py-3 hover:text-primary">
-                      <div className="font-medium">{t.title}</div>
-                      <div className="text-xs text-muted-foreground">{new Date(t.updated_at).toLocaleString("fr-FR")}</div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </motion.div>
+    <div className="px-4 md:px-8 lg:px-10 py-6 md:py-8 max-w-[1400px] mx-auto">
+      {/* Top bar */}
+      <div className="flex items-start justify-between gap-4 mb-8">
+        <div>
+          <h1 className="font-serif text-3xl md:text-4xl">Bonjour {firstName} <span className="inline-block">👋</span></h1>
+          <p className="text-muted-foreground mt-1">Prêt·e à prendre soin de vous aujourd'hui ?</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="h-10 w-10 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground" aria-label="Notifications">
+            <Bell className="h-4 w-4" />
+          </button>
+          <Link to="/app/assessment" className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm hover:opacity-90">
+            <Plus className="h-4 w-4" /> Nouveau suivi
+          </Link>
         </div>
       </div>
+
+      {/* KPI grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-card border border-border rounded-2xl p-5">
+          <div className="text-xs text-muted-foreground">Score Alyora</div>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="font-serif text-5xl">{score ?? "—"}</span>
+            <span className="text-sm text-muted-foreground">/100</span>
+          </div>
+          <div className="mt-2 text-xs text-primary">{score !== null ? (score >= 70 ? "Bonne dynamique !" : score >= 50 ? "À surveiller" : "Prenez soin de vous") : "Faites un premier point"}</div>
+          {/* Mini sparkline */}
+          <Sparkline values={assessments.slice(0, 8).map((a) => alyoraScore(a) ?? 0).reverse()} />
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="bg-card border border-border rounded-2xl p-5">
+          <div className="text-xs text-muted-foreground">Humeur du jour</div>
+          <div className="mt-3 flex items-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-accent/40 flex items-center justify-center text-2xl">😊</div>
+            <div>
+              <div className="font-serif text-xl">Plutôt bien</div>
+              <div className="text-xs text-muted-foreground">D'après votre dernier point</div>
+            </div>
+          </div>
+          <Link to="/app/assessment" className="mt-3 block text-xs text-primary hover:underline">Notez votre humeur ›</Link>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card border border-border rounded-2xl p-5">
+          <div className="text-xs text-muted-foreground">Progression</div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className={`font-serif text-4xl ${delta !== null && delta >= 0 ? "text-primary" : ""}`}>{delta !== null ? (delta >= 0 ? "+" : "") + delta : "—"}</span>
+            <TrendingUp className="h-5 w-5 text-primary" />
+          </div>
+          <div className="mt-1 text-xs text-muted-foreground">points cette semaine</div>
+          <Link to="/app/history" className="mt-3 block text-xs text-primary hover:underline">Voir le détail ›</Link>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-card border border-border rounded-2xl p-5">
+          <div className="text-xs text-muted-foreground">Objectif actuel</div>
+          <div className="mt-2 flex items-center gap-3">
+            <ProgressRing value={Math.min(100, total * 20)} />
+            <div>
+              <div className="font-serif text-lg leading-tight">Garder le rythme</div>
+              <div className="text-xs text-muted-foreground">{streak} sem. d'affilée</div>
+            </div>
+          </div>
+          <div className="mt-2 text-xs text-muted-foreground">Palier {next} : {total}/{next}</div>
+          <div className="mt-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+            <motion.div initial={{ width: 0 }} animate={{ width: `${milestoneProgress}%` }} className="h-full bg-primary" />
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Recommended */}
+      <section className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-serif text-xl">Recommandé pour vous</h2>
+          <Link to="/articles" className="text-xs text-muted-foreground hover:text-foreground">Voir tout ›</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { t: "Respiration 4-7-8", k: "Exercice · 3 min", icon: Brain, grad: "from-sage/30 to-primary/20" },
+            { t: "5 clés pour mieux gérer le stress", k: "Vidéo · 6 min", icon: Play, grad: "from-clay/30 to-accent/30" },
+            { t: "Épisode podcast Lâcher prise", k: "Podcast · 28 min", icon: Play, grad: "from-primary/20 to-accent/30" },
+          ].map((c) => (
+            <div key={c.t} className="bg-card border border-border rounded-2xl overflow-hidden">
+              <div className={`h-28 bg-gradient-to-br ${c.grad} flex items-center justify-center`}>
+                <div className="h-10 w-10 rounded-full bg-card/90 flex items-center justify-center">
+                  <c.icon className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="font-medium text-sm">{c.t}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{c.k}</div>
+              </div>
+            </div>
+          ))}
+          {/* Next appointment */}
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Prochain rendez-vous</div>
+            {recommended[0] ? (
+              <Link to="/therapists/$id" params={{ id: recommended[0].id }} className="flex items-center gap-3">
+                {recommended[0].photo_url ? (
+                  <img src={recommended[0].photo_url} alt={recommended[0].full_name} className="h-12 w-12 rounded-full object-cover" />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-secondary" />
+                )}
+                <div className="min-w-0">
+                  <div className="font-medium text-sm truncate">{recommended[0].full_name}</div>
+                  <div className="text-xs text-muted-foreground truncate">{recommended[0].title}</div>
+                  <div className="text-xs text-primary mt-1">Voir le profil ›</div>
+                </div>
+              </Link>
+            ) : (
+              <p className="text-sm text-muted-foreground">Aucun rendez-vous planifié.</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Activity + habits */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-serif text-lg">Votre activité cette semaine</h3>
+            <div className="text-xs text-muted-foreground inline-flex items-center gap-1"><Flame className="h-3.5 w-3.5 text-primary" /> {streak} sem. d'affilée</div>
+          </div>
+          <WeekChart counts={counts} maxCount={maxCount} labels={dayLabels} />
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-5">
+          <h3 className="font-serif text-lg mb-4">Vos habitudes</h3>
+          <div className="space-y-4">
+            {[
+              { icon: Brain, name: "Méditation", v: 3, m: 5 },
+              { icon: ActivityIcon, name: "Activité physique", v: 2, m: 5 },
+              { icon: Moon, name: "Sommeil", v: 4, m: 5 },
+            ].map((h) => (
+              <div key={h.name}>
+                <div className="flex items-center justify-between text-sm mb-1.5">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <h.icon className="h-4 w-4" />
+                    {h.name}
+                  </div>
+                  <span className="text-xs font-medium">{h.v}/{h.m} jours</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                  <div className="h-full bg-primary" style={{ width: `${(h.v / h.m) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
+  );
+}
+
+function Sparkline({ values }: { values: number[] }) {
+  if (values.length < 2) return <div className="mt-3 h-8" />;
+  const w = 120, h = 30;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = Math.max(1, max - min);
+  const points = values.map((v, i) => `${(i / (values.length - 1)) * w},${h - ((v - min) / range) * h}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 w-full h-8">
+      <polyline fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" points={points} />
+    </svg>
+  );
+}
+
+function ProgressRing({ value }: { value: number }) {
+  const r = 18, c = 2 * Math.PI * r;
+  const offset = c - (value / 100) * c;
+  return (
+    <svg viewBox="0 0 44 44" className="h-12 w-12 -rotate-90">
+      <circle cx="22" cy="22" r={r} fill="none" stroke="var(--secondary)" strokeWidth="4" />
+      <circle cx="22" cy="22" r={r} fill="none" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset} />
+    </svg>
+  );
+}
+
+function WeekChart({ counts, maxCount, labels }: { counts: number[]; maxCount: number; labels: string[] }) {
+  const w = 600, h = 140, pad = 20;
+  const points = counts.map((c, i) => {
+    const x = pad + (i * (w - pad * 2)) / (counts.length - 1);
+    const y = h - pad - (c / maxCount) * (h - pad * 2);
+    return { x, y, c };
+  });
+  const path = points.map((p, i) => (i === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(" ");
+  const area = `${path} L${points[points.length - 1].x},${h - pad} L${points[0].x},${h - pad} Z`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-36">
+      <defs>
+        <linearGradient id="wkgrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill="url(#wkgrad)" />
+      <path d={path} fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      {points.map((p, i) => (
+        <g key={i}>
+          <circle cx={p.x} cy={p.y} r="3.5" fill="var(--primary)" />
+          <text x={p.x} y={h - 4} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: 10 }}>{labels[i]}</text>
+        </g>
+      ))}
+    </svg>
   );
 }
