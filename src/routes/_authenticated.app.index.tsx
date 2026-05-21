@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
-import { Bell, Plus, Smile, TrendingUp, Target, Play, Flame, Brain, Moon, Activity as ActivityIcon } from "lucide-react";
+import { Bell, Plus, TrendingUp, Play, Flame, Brain, Moon, Activity as ActivityIcon } from "lucide-react";
 import { listAssessments } from "@/lib/assessment.functions";
 import { listPractitioners } from "@/lib/practitioners.functions";
 import { useAuth } from "@/hooks/useAuth";
@@ -111,15 +111,13 @@ function AppDashboard() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="bg-card border border-border rounded-2xl p-5">
-          <div className="text-xs text-muted-foreground">Humeur du jour</div>
-          <div className="mt-3 flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-accent/40 flex items-center justify-center text-2xl">😊</div>
-            <div>
-              <div className="font-serif text-xl">Plutôt bien</div>
-              <div className="text-xs text-muted-foreground">D'après votre dernier point</div>
-            </div>
+          <div className="text-xs text-muted-foreground">Suivi</div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="font-serif text-4xl">{total}</span>
+            <span className="text-sm text-muted-foreground">points complétés</span>
           </div>
-          <Link to="/app/assessment" className="mt-3 block text-xs text-primary hover:underline">Notez votre humeur ›</Link>
+          <div className="mt-1 text-xs text-muted-foreground">Vos données sont sauvegardées dans le cloud.</div>
+          <Link to="/app/assessment" className="mt-3 block text-xs text-primary hover:underline">Faire un nouveau point ›</Link>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card border border-border rounded-2xl p-5">
