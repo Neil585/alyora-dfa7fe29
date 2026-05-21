@@ -40,8 +40,8 @@ export function ChatPopup() {
           {
             type: "text",
             text: user
-              ? "Bonjour. Comment ça va, ces jours-ci ? On peut parler de ce que vous avez en tête, ou je peux vous orienter dans l'application."
-              : "Bonjour. Je suis Alyora. Vous pouvez me poser une question, ou créer un compte pour que je garde le fil avec vous.",
+              ? "Bonjour, je suis Alyora Genius. Comment ça va, ces jours-ci ? On peut parler de ce que vous avez en tête, ou je peux vous orienter dans l'application."
+              : "Bonjour, je suis Alyora Genius. Vous pouvez me poser une question, ou créer un compte pour que je garde le fil avec vous.",
           },
         ],
       } as UIMessage,
@@ -84,9 +84,15 @@ export function ChatPopup() {
       {open && (
         <div className="fixed bottom-6 right-6 z-50 w-[min(92vw,400px)] h-[min(80vh,600px)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/50">
-            <div>
-              <div className="font-serif text-lg leading-none">Alyora</div>
-              <div className="text-xs text-muted-foreground mt-0.5">À votre écoute</div>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              <div>
+                <div className="font-serif text-lg leading-none">Alyora Genius</div>
+                <div className="text-xs text-muted-foreground mt-0.5">À votre écoute</div>
+              </div>
             </div>
             <button
               onClick={() => setOpen(false)}
