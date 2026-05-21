@@ -89,10 +89,6 @@ export function AppSidebar() {
           <span className="font-serif text-2xl tracking-tight">alyora</span>
         </Link>
         {navList}
-        <Link to="/chat/$threadId" params={{ threadId: "new" }} className="mx-3 mb-3 px-3 py-2.5 rounded-xl text-sm flex items-center gap-3 text-muted-foreground hover:bg-secondary hover:text-foreground">
-          <MessageCircle className="h-4 w-4" />
-          Messages
-        </Link>
         {profile}
       </aside>
     </>
