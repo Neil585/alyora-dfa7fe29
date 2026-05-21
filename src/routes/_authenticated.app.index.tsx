@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
-import { Bell, Plus, Smile, TrendingUp, Target, Play, Flame, Brain, Moon, Activity as ActivityIcon } from "lucide-react";
+import { Bell, Plus, TrendingUp, Play, Flame, Brain, Moon, Activity as ActivityIcon } from "lucide-react";
 import { listAssessments } from "@/lib/assessment.functions";
 import { listPractitioners } from "@/lib/practitioners.functions";
 import { useAuth } from "@/hooks/useAuth";

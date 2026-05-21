@@ -134,8 +134,9 @@ function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        Alyora, plateforme de soutien émotionnel non médical. En cas d'urgence : 3114 (prévention du suicide), 15 (SAMU).
+      <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground space-y-2">
+        <div>Alyora, plateforme de soutien émotionnel non médical. En cas d'urgence : 3114 (prévention du suicide), 15 (SAMU).</div>
+        <div><Link to="/practitioner-space" className="hover:text-foreground underline-offset-4 hover:underline">Espace praticien ›</Link></div>
       </footer>
     </div>
   );
