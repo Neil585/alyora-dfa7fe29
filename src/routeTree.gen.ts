@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TherapistsRouteImport } from './routes/therapists'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PractitionerSpaceRouteImport } from './routes/practitioner-space'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -31,6 +32,11 @@ const TherapistsRoute = TherapistsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PractitionerSpaceRoute = PractitionerSpaceRouteImport.update({
+  id: '/practitioner-space',
+  path: '/practitioner-space',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/articles': typeof ArticlesRoute
   '/auth': typeof AuthRoute
+  '/practitioner-space': typeof PractitionerSpaceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/therapists': typeof TherapistsRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/articles': typeof ArticlesRoute
   '/auth': typeof AuthRoute
+  '/practitioner-space': typeof PractitionerSpaceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/therapists': typeof TherapistsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/articles': typeof ArticlesRoute
   '/auth': typeof AuthRoute
+  '/practitioner-space': typeof PractitionerSpaceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/therapists': typeof TherapistsRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/'
     | '/articles'
     | '/auth'
+    | '/practitioner-space'
     | '/sitemap.xml'
     | '/therapists'
     | '/app'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/'
     | '/articles'
     | '/auth'
+    | '/practitioner-space'
     | '/sitemap.xml'
     | '/therapists'
     | '/api/chat'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/articles'
     | '/auth'
+    | '/practitioner-space'
     | '/sitemap.xml'
     | '/therapists'
     | '/_authenticated/app'
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   ArticlesRoute: typeof ArticlesRoute
   AuthRoute: typeof AuthRoute
+  PractitionerSpaceRoute: typeof PractitionerSpaceRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TherapistsRoute: typeof TherapistsRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/practitioner-space': {
+      id: '/practitioner-space'
+      path: '/practitioner-space'
+      fullPath: '/practitioner-space'
+      preLoaderRoute: typeof PractitionerSpaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -330,6 +350,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   ArticlesRoute: ArticlesRoute,
   AuthRoute: AuthRoute,
+  PractitionerSpaceRoute: PractitionerSpaceRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TherapistsRoute: TherapistsRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
