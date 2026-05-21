@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Activity, Lightbulb, Users, LayoutDashboard, Settings, LogOut, Menu, X } from "lucide-react";
+import { Home, Lightbulb, Users, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,11 +7,8 @@ import logo from "@/assets/alyora-mark.png";
 
 const items = [
   { title: "Accueil", to: "/app", icon: Home, exact: true },
-  { title: "Tracker", to: "/app/assessment", icon: Activity },
   { title: "Conseils", to: "/articles", icon: Lightbulb },
   { title: "Praticiens", to: "/therapists", icon: Users },
-  { title: "Tableau de bord", to: "/app/history", icon: LayoutDashboard },
-  { title: "Espace praticien", to: "/practitioner-space", icon: Settings },
 ] as const;
 
 export function AppSidebar() {
