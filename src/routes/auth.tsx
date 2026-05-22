@@ -22,7 +22,6 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
     if (user) navigate({ to: "/app" });
@@ -48,25 +47,6 @@ function AuthPage() {
       toast.error(e instanceof Error ? e.message : "Une erreur est survenue");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    setGoogleLoading(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/app",
-      });
-      if (result.error) {
-        toast.error(result.error instanceof Error ? result.error.message : "Connexion Google impossible");
-        setGoogleLoading(false);
-        return;
-      }
-      if (result.redirected) return;
-      navigate({ to: "/app" });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Connexion Google impossible");
-      setGoogleLoading(false);
     }
   };
 
