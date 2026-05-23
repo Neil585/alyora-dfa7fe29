@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "motion/react";
 import heroImg from "@/assets/hero.jpg";
 import textureImg from "@/assets/texture.jpg";
 
@@ -15,43 +16,108 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <div>
-      {/* Hero */}
-      <section className="relative">
-        <div className="mx-auto max-w-6xl px-6 pt-16 pb-24 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="font-serif text-5xl md:text-6xl leading-[1.05] text-foreground">
-              Faites le point. Suivez votre évolution. Trouvez le bon praticien.
+      {/* Hero — layered, minimal copy */}
+      <section className="relative overflow-hidden">
+        {/* Ambient layers */}
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 0.55, scale: 1 }}
+          transition={{ duration: 1.6, ease: "easeOut" }}
+          className="pointer-events-none absolute -top-32 -left-24 h-[420px] w-[420px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, var(--sage), transparent 70%)" }}
+        />
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 0.45, scale: 1 }}
+          transition={{ duration: 1.8, ease: "easeOut", delay: 0.1 }}
+          className="pointer-events-none absolute -bottom-40 -right-20 h-[480px] w-[480px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, var(--clay), transparent 70%)" }}
+        />
+
+        <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-28 grid md:grid-cols-12 gap-10 items-center">
+          <div className="md:col-span-6">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Soutien émotionnel
+            </motion.div>
+
+            <h1 className="font-serif text-5xl md:text-7xl leading-[1.02] text-foreground">
+              {["Reprendre", "pied,", "doucement."].map((w, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 + i * 0.12 }}
+                  className="inline-block mr-3"
+                >
+                  {w}
+                </motion.span>
+              ))}
             </h1>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-lg">
-              Alyora est un espace privé où vous évaluez votre état mental avec des questionnaires reconnus, gardez l'historique de vos bilans, et parlez à un compagnon qui connaît votre dossier. Le tout en quelques minutes.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.55 }}
+              className="mt-6 text-lg text-muted-foreground max-w-md"
+            >
+              Faites le point. Suivez votre évolution.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.7 }}
+              className="mt-8 flex flex-wrap gap-3"
+            >
               <Link to="/auth" search={{ mode: "signup" }} className="px-6 py-3 bg-primary text-primary-foreground rounded-full text-sm hover:opacity-90 transition-opacity">
-                Faire mon premier bilan
+                Premier bilan
               </Link>
               <Link to="/therapists" className="px-6 py-3 border border-border rounded-full text-sm hover:bg-secondary transition-colors">
-                Voir les praticiens
+                Praticiens
               </Link>
-            </div>
-            <div className="mt-8 grid grid-cols-3 gap-4 max-w-md">
-              <div>
-                <div className="font-serif text-2xl">5 min</div>
-                <div className="text-xs text-muted-foreground">par bilan</div>
-              </div>
-              <div>
-                <div className="font-serif text-2xl">PHQ-9</div>
-                <div className="text-xs text-muted-foreground">GAD-7, MBI</div>
-              </div>
-              <div>
-                <div className="font-serif text-2xl">100 %</div>
-                <div className="text-xs text-muted-foreground">confidentiel</div>
-              </div>
-            </div>
+            </motion.div>
           </div>
-          <div className="relative">
-            <div className="aspect-[4/5] rounded-3xl overflow-hidden">
+
+          <div className="md:col-span-6 relative">
+            <motion.div
+              aria-hidden
+              initial={{ opacity: 0, rotate: -6, y: 20 }}
+              animate={{ opacity: 1, rotate: -4, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+              className="absolute -top-6 -left-6 h-40 w-40 rounded-3xl border border-border bg-card/60 backdrop-blur-sm hidden md:block"
+            />
+            <motion.div
+              aria-hidden
+              initial={{ opacity: 0, rotate: 8, y: 20 }}
+              animate={{ opacity: 1, rotate: 5, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+              className="absolute -bottom-8 -right-4 h-48 w-32 rounded-3xl bg-accent/60 hidden md:block"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+              className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl"
+            >
               <img src={heroImg} alt="Personne calme dans un environnement apaisant" className="w-full h-full object-cover" width={1200} height={1500} />
-            </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="absolute -bottom-6 left-6 md:left-10 bg-card border border-border rounded-2xl px-4 py-3 shadow-lg flex items-center gap-3"
+            >
+              <div className="font-serif text-2xl leading-none">5 min</div>
+              <div className="text-xs text-muted-foreground leading-tight">par bilan<br/>100% confidentiel</div>
+            </motion.div>
           </div>
         </div>
       </section>
